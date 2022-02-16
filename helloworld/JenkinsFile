@@ -1,0 +1,36 @@
+pipeline {
+    agent any
+    tools {
+         maven 'maven3'
+    }
+    stages{
+        stage('Build'){
+            steps{
+                  //sh script: 'mvn clean package'
+                  cleanWs()
+                  checkout scm
+                  echo "Building ${env.project1}..."
+            }
+        }
+        stage('Upload War To Nexus'){
+            steps{
+                nexusArtifactUploader artifacts:[
+                   [
+                        artifactId: 'RegisterPage',
+                       classifier: '',
+                       file: '/var/lib/jenkins/jobs/helloworld/config.xml',
+                      type: 'war'
+                 ]
+             ],
+                   credentialsId: 'grocery',
+                   groupId: 'grocery',
+                   nexusUrl: '34.207.127.21:8081',
+                   nexusVersion: 'nexus3',
+                   protocol: 'http',
+                   repository: 'maven-snapshots',
+                   version: '1.0-SNAPSHOT'
+
+            }
+        }
+    }
+ }
